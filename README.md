@@ -1,6 +1,6 @@
 # Chat Widget Backend Server
 
-This is a simple Express.js backend that proxies requests to OpenAI's API.
+This is a simple Express.js backend that proxies requests to Google Gemini's API.
 
 ## Quick Start
 
@@ -16,7 +16,7 @@ This is a simple Express.js backend that proxies requests to OpenAI's API.
    copy ..\.env.template .env
    ```
 
-   Then edit `.env` and add your OpenAI API key.
+   Then edit `.env` and add your GOOGLE API key.
 
 3. **Run the server:**
    ```bash
@@ -84,7 +84,7 @@ data: [DONE]
 
 ## Environment Variables
 
-- `OPENAI_API_KEY` - Your OpenAI API key (required)
+- `GOOGLE_API_KEY` - Your GOOGLE API key (required)
 - `PORT` - Server port (default: 3001)
 - `FRONTEND_URL` - Frontend URL for CORS (default: http://localhost:5173)
 
