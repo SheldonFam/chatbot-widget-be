@@ -1,9 +1,11 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-const ALLOWED_ORIGINS = [process.env.FRONTEND_URL, "http://localhost:5173"];
+const ALLOWED_ORIGINS = (
+  process.env.FRONTEND_URL?.split(",") ?? ["http://localhost:5173"]
+).filter(Boolean);
 
 export function applyCors(req: VercelRequest, res: VercelResponse): boolean {
-  const origin = req.headers.origin as string;
+  const origin = req.headers.origin;
 
   if (origin && ALLOWED_ORIGINS.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
@@ -11,13 +13,12 @@ export function applyCors(req: VercelRequest, res: VercelResponse): boolean {
 
   res.setHeader("Vary", "Origin");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  // Preflight request
   if (req.method === "OPTIONS") {
-    res.status(200).end();
-    return true; // request handled
+    res.status(204).end();
+    return true;
   }
 
-  return false; // continue request
+  return false;
 }
