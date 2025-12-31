@@ -7,7 +7,7 @@ import type {
   ChatResponse,
   HealthResponse,
   StreamChunk,
-} from "./types";
+} from "./src/types";
 
 dotenv.config();
 
