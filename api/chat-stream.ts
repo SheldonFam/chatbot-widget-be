@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { ai } from "./gemini";
 import type { ChatRequest, StreamChunk } from "../src/types";
-import { applyCors } from "../src/cors";
+import { applyCors } from "../src/cors.js";
 
 export const config = {
   runtime: "nodejs",
