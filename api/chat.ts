@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { ai } from "./gemini";
-import type { ChatRequest, ChatResponse } from "../types";
+import type { ChatRequest, ChatResponse } from "../src/types";
 import { applyCors } from "../src/cors";
 
 export default async function handler(

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { ai } from "./gemini";
-import type { ChatRequest, StreamChunk } from "../types";
+import type { ChatRequest, StreamChunk } from "../src/types";
 import { applyCors } from "../src/cors";
 
 export const config = {
