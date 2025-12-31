@@ -1,11 +1,16 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { ai } from "../src/gemini";
 import type { ChatRequest, ChatResponse } from "../types";
+import { applyCors } from "../src/cors";
 
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ): Promise<void> {
+  if (applyCors(req, res)) {
+    return;
+  }
+
   if (req.method !== "POST") {
     res.status(405).json({
       success: false,

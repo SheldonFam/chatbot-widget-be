@@ -1,12 +1,17 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { ai } from "../src/gemini";
 import type { ChatRequest, StreamChunk } from "../types";
+import { applyCors } from "../src/cors";
 
 export const config = {
   runtime: "nodejs",
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (applyCors(req, res)) {
+    return;
+  }
+
   if (req.method !== "POST") {
     res.status(405).end();
     return;
