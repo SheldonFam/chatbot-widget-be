@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { ai } from "../src/gemini";
+import { ai } from "./gemini";
 import type { ChatRequest, StreamChunk } from "../types";
 import { applyCors } from "../src/cors";
 
