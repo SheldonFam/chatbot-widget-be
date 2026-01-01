@@ -1,11 +1,19 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { ai } from "./gemini";
 import type { ChatRequest, StreamChunk } from "../src/types";
 import { applyCors } from "../src/cors.js";
+import {
+  getAIClient,
+  buildContentsFromHistory,
+  SYSTEM_INSTRUCTION,
+  DEFAULT_GENERATION_CONFIG,
+} from "../utils/ai.js";
 
 export const config = {
   runtime: "nodejs",
 };
+
+// Initialize AI client at module level (singleton for serverless functions)
+const ai = getAIClient();
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (applyCors(req, res)) {
@@ -33,25 +41,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    const contents = conversationHistory.map((msg) => ({
-      role: msg.sender === "user" ? "user" : "model",
-      parts: [{ text: msg.content }],
-    }));
-
-    contents.push({
-      role: "user",
-      parts: [{ text: message.trim() }],
-    });
+    // Build contents array using shared utility
+    const contents = buildContentsFromHistory(
+      conversationHistory,
+      message.trim()
+    );
 
     const stream = await ai.models.generateContentStream({
       model: "gemini-2.5-flash",
       contents,
-      systemInstruction:
-        "You are a helpful assistant in a chat widget. Be concise and friendly.",
-      generationConfig: {
-        maxOutputTokens: 500,
-        temperature: 0.7,
-      },
+      systemInstruction: SYSTEM_INSTRUCTION,
+      generationConfig: DEFAULT_GENERATION_CONFIG,
     } as Parameters<typeof ai.models.generateContentStream>[0]);
 
     for await (const chunk of stream) {
