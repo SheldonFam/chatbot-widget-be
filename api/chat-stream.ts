@@ -7,6 +7,7 @@ import {
   SYSTEM_INSTRUCTION,
   DEFAULT_GENERATION_CONFIG,
 } from "../utils/ai.js";
+import { validateChatRequest } from "../utils/validation.js";
 
 export const config = {
   runtime: "nodejs",
@@ -15,7 +16,10 @@ export const config = {
 // Initialize AI client at module level (singleton for serverless functions)
 const ai = getAIClient();
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse
+): Promise<void> {
   if (applyCors(req, res)) {
     return;
   }
@@ -25,22 +29,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
+  // Validate request before setting up streaming
+  const validation = validateChatRequest(req.body);
+  if (!validation.isValid) {
+    res.setHeader("Content-Type", "application/json");
+    res.status(400).json({
+      error: validation.error?.error || "Invalid request",
+    });
+    return;
+  }
+
+  const { message, conversationHistory = [] } = req.body as ChatRequest;
+
   try {
-    const { message, conversationHistory = [] } = req.body as ChatRequest;
-
-    if (
-      !message ||
-      typeof message !== "string" ||
-      message.trim().length === 0
-    ) {
-      res.status(400).end("Message is required and must be a non-empty string");
-      return;
-    }
-
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-
     // Build contents array using shared utility
     const contents = buildContentsFromHistory(
       conversationHistory,

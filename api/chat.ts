@@ -7,6 +7,11 @@ import {
   SYSTEM_INSTRUCTION,
   DEFAULT_GENERATION_CONFIG,
 } from "../utils/ai.js";
+import { validateChatRequest } from "../utils/validation.js";
+
+export const config = {
+  runtime: "nodejs",
+};
 
 // Initialize AI client at module level (singleton for serverless functions)
 const ai = getAIClient();
@@ -28,22 +33,16 @@ export default async function handler(
     return;
   }
 
+  // Validate request
+  const validation = validateChatRequest(req.body);
+  if (!validation.isValid) {
+    res.status(400).json(validation.error!);
+    return;
+  }
+
+  const { message, conversationHistory = [] } = req.body as ChatRequest;
+
   try {
-    const { message, conversationHistory = [] } = req.body as ChatRequest;
-
-    if (
-      !message ||
-      typeof message !== "string" ||
-      message.trim().length === 0
-    ) {
-      res.status(400).json({
-        success: false,
-        response: "",
-        error: "Message is required and must be a non-empty string",
-      });
-      return;
-    }
-
     // Build contents array using shared utility
     const contents = buildContentsFromHistory(
       conversationHistory,
