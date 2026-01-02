@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import type {
   ChatRequest,
@@ -8,16 +7,20 @@ import type {
   HealthResponse,
   StreamChunk,
 } from "./src/types";
+import {
+  getAIClient,
+  buildContentsFromHistory,
+  SYSTEM_INSTRUCTION,
+  DEFAULT_GENERATION_CONFIG,
+} from "./utils/ai.js";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Initialize Gemini - it automatically reads GEMINI_API_KEY from env
-const ai = new GoogleGenAI({
-  apiKey: process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY || "",
-});
+// Initialize Gemini using shared utility
+const ai = getAIClient();
 
 // Middleware
 app.use(cors());
@@ -26,7 +29,7 @@ app.use(express.json());
 // ============================================
 // Health Check Endpoint
 // ============================================
-app.get("/health", (_req: Request, res: Response<HealthResponse>) => {
+app.get("/api/health", (_req: Request, res: Response<HealthResponse>) => {
   res.json({
     status: "ok",
     message: "Chat API is running with Gemini 2.5",
@@ -51,35 +54,16 @@ app.post(
         });
       }
 
-      // Build contents array with conversation history
-      const contents: Array<{ role: string; parts: Array<{ text: string }> }> =
-        [];
-
-      // Add conversation history
-      conversationHistory.forEach((msg) => {
-        contents.push({
-          role: msg.sender === "user" ? "user" : "model",
-          parts: [{ text: msg.content }],
-        });
-      });
-
-      // Add current user message
-      contents.push({
-        role: "user",
-        parts: [{ text: message }],
-      });
+      // Build contents array using shared utility
+      const contents = buildContentsFromHistory(conversationHistory, message);
 
       // Call Gemini API
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents: contents,
+        contents,
         // @ts-ignore - systemInstruction is valid but not in type definitions yet
-        systemInstruction:
-          "You are a helpful assistant in a chat widget. Be concise and friendly.",
-        generationConfig: {
-          maxOutputTokens: 500,
-          temperature: 0.7,
-        },
+        systemInstruction: SYSTEM_INSTRUCTION,
+        generationConfig: DEFAULT_GENERATION_CONFIG,
       });
 
       return res.json({
@@ -105,7 +89,7 @@ app.post(
 // Streaming Endpoint
 // ============================================
 app.post(
-  "/api/chat/stream",
+  "/api/chat-stream",
   async (req: Request<{}, {}, ChatRequest>, res: Response): Promise<void> => {
     try {
       const { message, conversationHistory = [] } = req.body;
@@ -119,33 +103,16 @@ app.post(
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
 
-      // Build contents array
-      const contents: Array<{ role: string; parts: Array<{ text: string }> }> =
-        [];
-
-      conversationHistory.forEach((msg) => {
-        contents.push({
-          role: msg.sender === "user" ? "user" : "model",
-          parts: [{ text: msg.content }],
-        });
-      });
-
-      contents.push({
-        role: "user",
-        parts: [{ text: message }],
-      });
+      // Build contents array using shared utility
+      const contents = buildContentsFromHistory(conversationHistory, message);
 
       // Stream response
       const stream = await ai.models.generateContentStream({
         model: "gemini-2.5-flash",
-        contents: contents,
+        contents,
         // @ts-ignore - systemInstruction is valid but not in type definitions yet
-        systemInstruction:
-          "You are a helpful assistant in a chat widget. Be concise and friendly.",
-        generationConfig: {
-          maxOutputTokens: 500,
-          temperature: 0.7,
-        },
+        systemInstruction: SYSTEM_INSTRUCTION,
+        generationConfig: DEFAULT_GENERATION_CONFIG,
       });
 
       for await (const chunk of stream) {
