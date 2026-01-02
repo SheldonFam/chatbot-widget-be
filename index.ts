@@ -29,7 +29,7 @@ app.use(express.json());
 // ============================================
 // Health Check Endpoint
 // ============================================
-app.get("/health", (_req: Request, res: Response<HealthResponse>) => {
+app.get("/api/health", (_req: Request, res: Response<HealthResponse>) => {
   res.json({
     status: "ok",
     message: "Chat API is running with Gemini 2.5",
@@ -89,7 +89,7 @@ app.post(
 // Streaming Endpoint
 // ============================================
 app.post(
-  "/api/chat/stream",
+  "/api/chat-stream",
   async (req: Request<{}, {}, ChatRequest>, res: Response): Promise<void> => {
     try {
       const { message, conversationHistory = [] } = req.body;
