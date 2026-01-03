@@ -1,147 +1,115 @@
-import express, { Request, Response } from "express";
+/**
+ * Main Express Application
+ * Entry point for the chatbot API server
+ */
+
+import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import type {
-  ChatRequest,
-  ChatResponse,
-  HealthResponse,
-  StreamChunk,
-} from "./src/types";
+import { config } from "./src/config/index.js";
+import { requestLogger } from "./src/middleware/requestLogger.js";
+import { apiLimiter } from "./src/middleware/rateLimiter.js";
 import {
-  getAIClient,
-  buildContentsFromHistory,
-  SYSTEM_INSTRUCTION,
-  DEFAULT_GENERATION_CONFIG,
-} from "./utils/ai.js";
+  errorHandler,
+  notFoundHandler,
+} from "./src/middleware/errorHandler.js";
+import v1Routes from "./src/routes/v1/index.js";
 
+// Load environment variables
 dotenv.config();
 
+// Initialize Express app
 const app = express();
-const port = process.env.PORT || 3001;
 
-// Initialize Gemini using shared utility
-const ai = getAIClient();
+// ============================================
+// Global Middleware
+// ============================================
 
-// Middleware
-app.use(cors());
+/**
+ * CORS configuration
+ * Allows requests from configured frontend origins
+ */
+app.use(
+  cors({
+    origin: config.allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  })
+);
+
+/**
+ * Request body parsing
+ */
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/**
+ * Request logging
+ */
+app.use(requestLogger);
+
+/**
+ * Rate limiting for all API routes
+ */
+app.use("/api", apiLimiter);
 
 // ============================================
-// Health Check Endpoint
+// API Routes
 // ============================================
-app.get("/api/health", (_req: Request, res: Response<HealthResponse>) => {
+
+/**
+ * Mount v1 API routes
+ */
+app.use("/api/v1", v1Routes);
+
+/**
+ * Root endpoint
+ */
+app.get("/", (_req, res) => {
   res.json({
-    status: "ok",
-    message: "Chat API is running with Gemini 2.5",
-    timestamp: Date.now(),
+    name: "Chatbot Widget API",
+    version: "1.0.0",
+    status: "running",
+    endpoints: {
+      health: "/api/v1/health",
+      chat: "/api/v1/chat",
+      chatStream: "/api/v1/chat/stream",
+    },
+    documentation: "See README.md for API documentation",
   });
 });
 
 // ============================================
-// Chat Endpoint (Non-streaming)
+// Error Handling
 // ============================================
-app.post(
-  "/api/chat",
-  async (req: Request<{}, {}, ChatRequest>, res: Response<ChatResponse>) => {
-    try {
-      const { message, conversationHistory = [] } = req.body;
 
-      if (!message) {
-        return res.status(400).json({
-          success: false,
-          response: "",
-          error: "Message is required",
-        });
-      }
+/**
+ * 404 handler - must be after all routes
+ */
+app.use(notFoundHandler);
 
-      // Build contents array using shared utility
-      const contents = buildContentsFromHistory(conversationHistory, message);
-
-      // Call Gemini API
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents,
-        // @ts-ignore - systemInstruction is valid but not in type definitions yet
-        systemInstruction: SYSTEM_INSTRUCTION,
-        generationConfig: DEFAULT_GENERATION_CONFIG,
-      });
-
-      return res.json({
-        success: true,
-        response: response.text || "",
-      });
-    } catch (error) {
-      console.error("Gemini API Error:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-
-      return res.status(500).json({
-        success: false,
-        response: "",
-        error: "Failed to get response from AI",
-        details: errorMessage,
-      });
-    }
-  }
-);
-
-// ============================================
-// Streaming Endpoint
-// ============================================
-app.post(
-  "/api/chat-stream",
-  async (req: Request<{}, {}, ChatRequest>, res: Response): Promise<void> => {
-    try {
-      const { message, conversationHistory = [] } = req.body;
-
-      if (!message) {
-        res.status(400).json({ error: "Message is required" });
-        return;
-      }
-
-      res.setHeader("Content-Type", "text/event-stream");
-      res.setHeader("Cache-Control", "no-cache");
-      res.setHeader("Connection", "keep-alive");
-
-      // Build contents array using shared utility
-      const contents = buildContentsFromHistory(conversationHistory, message);
-
-      // Stream response
-      const stream = await ai.models.generateContentStream({
-        model: "gemini-2.5-flash",
-        contents,
-        // @ts-ignore - systemInstruction is valid but not in type definitions yet
-        systemInstruction: SYSTEM_INSTRUCTION,
-        generationConfig: DEFAULT_GENERATION_CONFIG,
-      });
-
-      for await (const chunk of stream) {
-        const content = chunk.text;
-        if (content) {
-          const streamChunk: StreamChunk = { content };
-          res.write(`data: ${JSON.stringify(streamChunk)}\n\n`);
-        }
-      }
-
-      res.write("data: [DONE]\n\n");
-      res.end();
-    } catch (error) {
-      console.error("Streaming Error:", error);
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-      const errorChunk: StreamChunk = { error: errorMessage };
-
-      res.write(`data: ${JSON.stringify(errorChunk)}\n\n`);
-      res.end();
-    }
-  }
-);
+/**
+ * Global error handler - must be last
+ */
+app.use(errorHandler);
 
 // ============================================
 // Start Server
 // ============================================
-app.listen(port, () => {
-  console.log(`🚀 Chat API server running on http://localhost:${port}`);
-  console.log(`🤖 Using Google Gemini 2.5 Flash (FREE & Latest!)`);
-  console.log(`📝 TypeScript enabled for better type safety`);
+
+/**
+ * Start the Express server
+ */
+app.listen(config.port, () => {
+  console.log(`\n🚀 Server started successfully!`);
+  console.log(`📡 Port: ${config.port}`);
+  console.log(`🌍 Environment: ${config.nodeEnv}`);
+  console.log(`🤖 AI Model: ${config.ai.model}`);
+  console.log(`🔗 Base URL: http://localhost:${config.port}`);
+  console.log(`\n📚 Available endpoints:`);
+  console.log(`   GET  /api/v1/health       - Health check`);
+  console.log(`   POST /api/v1/chat         - Chat (non-streaming)`);
+  console.log(`   POST /api/v1/chat/stream  - Chat (streaming)`);
 });
+
+export default app;

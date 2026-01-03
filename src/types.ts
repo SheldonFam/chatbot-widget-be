@@ -2,9 +2,17 @@
 // Message Types
 // ============================================
 
-export type MessageSender = "user" | "bot";
+export type MessageRole = "user" | "assistant";
 
 export interface Message {
+  role: MessageRole;
+  content: string;
+}
+
+// Legacy frontend message format (for backwards compatibility)
+export type MessageSender = "user" | "bot";
+
+export interface LegacyMessage {
   id: string;
   content: string;
   sender: MessageSender;
@@ -19,7 +27,9 @@ export interface Message {
 
 export interface ChatRequest {
   message: string;
-  conversationHistory?: Message[];
+  history?: Message[];
+  // Legacy support
+  conversationHistory?: LegacyMessage[];
 }
 
 export interface ChatResponse {
