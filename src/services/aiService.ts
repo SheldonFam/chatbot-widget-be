@@ -119,7 +119,6 @@ export class AIService {
       throw new AIServiceError("Failed to generate AI response", errorMessage);
     }
   }
-
   /**
    * Generate a streaming chat response
    * @param message - Current user message
@@ -127,48 +126,37 @@ export class AIService {
    * @returns Async generator yielding text chunks
    * @throws AIServiceError if generation fails
    */
-  // async *generateStreamingResponse(
-  //   message: string,
-  //   history: Message[] = []
-  // ): AsyncGenerator<string, void, unknown> {
-  //   try {
-  //     const contents = this.buildContentsFromHistory(message, history);
+  async *generateStreamingResponse(
+    message: string,
+    history: Message[] = []
+  ): AsyncGenerator<string, void, unknown> {
+    try {
+      const contents = this.buildContentsFromHistory(message, history);
 
-  //     const stream = await this.ai.models.generateContentStream({
-  //       model: config.ai.model,
-  //       contents,
-  //     });
+      const response = await this.ai.models.generateContentStream({
+        model: config.ai.model,
+        contents,
+      });
 
-  //     for await (const chunk of stream) {
-  //       const text = chunk.text; // ✅ Property, not method
-  //       if (text) {
-  //         yield text;
-  //       }
-  //     }
-  //   } catch (error) {
-  //     if (error instanceof AIServiceError) {
-  //       throw error;
-  //     }
+      for await (const chunk of response) {
+        const text = chunk.text;
+        if (text) {
+          yield text;
+        }
+      }
+    } catch (error) {
+      if (error instanceof AIServiceError) {
+        throw error;
+      }
 
-  //     // Log the full error to understand what's happening
-  //     console.error("🔴 Gemini API Streaming Error Details:", {
-  //       errorType: error?.constructor?.name,
-  //       message: error instanceof Error ? error.message : String(error),
-  //       code: (error as any)?.code,
-  //       status: (error as any)?.status,
-  //       statusCode: (error as any)?.statusCode,
-  //       details: (error as any)?.details,
-  //       fullError: error,
-  //     });
-
-  //     const errorMessage =
-  //       error instanceof Error ? error.message : "Unknown error";
-  //     throw new AIServiceError(
-  //       "Failed to generate streaming response",
-  //       errorMessage
-  //     );
-  //   }
-  // }
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      throw new AIServiceError(
+        "Failed to generate streaming response",
+        errorMessage
+      );
+    }
+  }
 
   /**
    * Health check for AI service
