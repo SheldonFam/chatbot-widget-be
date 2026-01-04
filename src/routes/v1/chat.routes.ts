@@ -6,7 +6,7 @@
 import { Router } from "express";
 import {
   handleChat,
-  //   handleChatStream,
+  handleChatStream,
 } from "../../controllers/chatController.js";
 import { chatLimiter } from "../../middleware/rateLimiter.js";
 
@@ -17,5 +17,11 @@ const router = Router();
  * Non-streaming chat endpoint
  */
 router.post("/", chatLimiter, handleChat);
+
+/**
+ * POST /api/v1/chat/stream
+ * Streaming chat endpoint (Server-Sent Events)
+ */
+router.post("/stream", chatLimiter, handleChatStream);
 
 export default router;
