@@ -26,7 +26,7 @@ const app = express();
 // ============================================
 
 /**
- * CORS configuration
+ * w configuration
  * Allows requests from configured frontend origins
  */
 app.use(
@@ -34,6 +34,8 @@ app.use(
     origin: config.allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "x-api-key"],
+    exposedHeaders: ["Content-Type"],
   })
 );
 
