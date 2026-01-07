@@ -26,7 +26,7 @@ const app = express();
 // ============================================
 
 /**
- * w configuration
+ * CORS configuration
  * Allows requests from configured frontend origins
  */
 app.use(
@@ -105,6 +105,7 @@ app.use(errorHandler);
  * Start the Express server
  */
 app.listen(config.port, () => {
+  /* eslint-disable no-console */
   console.log(`\n🚀 Server started successfully!`);
   console.log(`📡 Port: ${config.port}`);
   console.log(`🌍 Environment: ${config.nodeEnv}`);
@@ -116,6 +117,7 @@ app.listen(config.port, () => {
   console.log(`   POST /api/v1/chat/stream       - Chat (streaming)`);
   console.log(`   POST /api/v1/documents/upload  - Upload PDF document`);
   console.log(`   POST /api/v1/documents/qa      - Q&A over document`);
+  /* eslint-enable no-console */
 });
 
 export default app;

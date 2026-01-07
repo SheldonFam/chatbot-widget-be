@@ -14,7 +14,7 @@ import type { ChatRequest, ChatResponse, StreamChunk } from "../types.js";
  * POST /api/v1/chat
  */
 export async function handleChat(
-  req: Request<{}, {}, ChatRequest>,
+  req: Request<Record<string, never>, Record<string, never>, ChatRequest>,
   res: Response<ChatResponse>,
   next: NextFunction
 ): Promise<void> {
@@ -29,7 +29,7 @@ export async function handleChat(
 
     // Generate AI response
     const responseText = await aiService.generateChatResponse(message, history);
-    console.log("responseText", responseText);
+
     // Send successful response
     res.json({
       success: true,
@@ -45,7 +45,7 @@ export async function handleChat(
  * POST /api/v1/chat/stream
  */
 export async function handleChatStream(
-  req: Request<{}, {}, ChatRequest>,
+  req: Request<Record<string, never>, Record<string, never>, ChatRequest>,
   res: Response,
   next: NextFunction
 ): Promise<void> {

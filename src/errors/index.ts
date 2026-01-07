@@ -33,7 +33,7 @@ export class ValidationError extends AppError {
  * Status code: 401
  */
 export class AuthenticationError extends AppError {
-  constructor(message: string = 'Invalid or missing API key') {
+  constructor(message: string = "Invalid or missing API key") {
     super(message, 401);
   }
 }
@@ -43,7 +43,7 @@ export class AuthenticationError extends AppError {
  * Status code: 404
  */
 export class NotFoundError extends AppError {
-  constructor(message: string = 'Resource not found') {
+  constructor(message: string = "Resource not found") {
     super(message, 404);
   }
 }
@@ -54,7 +54,7 @@ export class NotFoundError extends AppError {
  */
 export class AIServiceError extends AppError {
   constructor(
-    message: string = 'AI service is currently unavailable',
+    message: string = "AI service is currently unavailable",
     public details?: string
   ) {
     super(message, 503);
@@ -66,7 +66,7 @@ export class AIServiceError extends AppError {
  * Status code: 429
  */
 export class RateLimitError extends AppError {
-  constructor(message: string = 'Too many requests, please try again later') {
+  constructor(message: string = "Too many requests, please try again later") {
     super(message, 429);
   }
 }

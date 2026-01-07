@@ -3,9 +3,9 @@
  * Centralized error handler for all Express errors
  */
 
-import { Request, Response, NextFunction } from 'express';
-import { AppError } from '../errors/index.js';
-import { isDevelopment } from '../config/index.js';
+import { Request, Response, NextFunction } from "express";
+import { AppError } from "../errors/index.js";
+import { isDevelopment } from "../config/index.js";
 
 /**
  * Standard error response format
@@ -33,7 +33,7 @@ export function errorHandler(
 ): void {
   // Default to 500 server error
   let statusCode = 500;
-  let message = 'Internal server error';
+  let message = "Internal server error";
   let details: string | undefined;
 
   // Handle known AppError instances
@@ -42,18 +42,18 @@ export function errorHandler(
     message = err.message;
 
     // Include details if available (e.g., AIServiceError)
-    if ('details' in err && err.details) {
+    if ("details" in err && err.details) {
       details = err.details as string;
     }
   } else {
     // Log unexpected errors
-    console.error('Unexpected error:', err);
+    console.error("Unexpected error:", err);
   }
 
   // Build error response
   const errorResponse: ErrorResponse = {
     success: false,
-    error: err.name || 'Error',
+    error: err.name || "Error",
     message,
     statusCode,
     timestamp: new Date().toISOString(),
@@ -81,7 +81,7 @@ export function errorHandler(
 export function notFoundHandler(req: Request, res: Response): void {
   res.status(404).json({
     success: false,
-    error: 'Not Found',
+    error: "Not Found",
     message: `Cannot ${req.method} ${req.path}`,
     statusCode: 404,
     timestamp: new Date().toISOString(),

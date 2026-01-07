@@ -3,7 +3,7 @@
  * Handles health check endpoint
  */
 
-import { Request, Response } from 'express';
+import { Request, Response } from "express";
 
 /**
  * Health check endpoint
@@ -11,8 +11,8 @@ import { Request, Response } from 'express';
  */
 export function handleHealthCheck(_req: Request, res: Response): void {
   res.json({
-    status: 'ok',
-    message: 'Server is running',
+    status: "ok",
+    message: "Server is running",
     timestamp: new Date().toISOString(),
   });
 }

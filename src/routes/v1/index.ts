@@ -3,44 +3,38 @@
  * Aggregates all v1 routes
  */
 
-import { Router } from 'express';
-import healthRoutes from './health.routes.js';
-import chatRoutes from './chat.routes.js';
-import documentRoutes from './document.routes.js';
-import { authenticate } from '../../middleware/auth.js';
+import { Router } from "express";
+import healthRoutes from "./health.routes.js";
+import chatRoutes from "./chat.routes.js";
+import documentRoutes from "./document.routes.js";
+import { authenticate } from "../../middleware/auth.js";
 import {
   handlePDFUpload,
   uploadPDF,
-} from '../../controllers/documentController.js';
-import { chatLimiter } from '../../middleware/rateLimiter.js';
+} from "../../controllers/documentController.js";
+import { chatLimiter } from "../../middleware/rateLimiter.js";
 
 const router = Router();
 
 /**
  * Health routes - No authentication required
  */
-router.use('/health', healthRoutes);
+router.use("/health", healthRoutes);
 
 /**
  * Chat routes - Authentication required
  */
-router.use('/chat', authenticate, chatRoutes);
+router.use("/chat", authenticate, chatRoutes);
 
 /**
  * Document routes - Authentication required
  */
-router.use('/documents', authenticate, documentRoutes);
+router.use("/documents", authenticate, documentRoutes);
 
 /**
  * Alias for document upload (shorter path for convenience)
  * POST /api/v1/upload -> same as /api/v1/documents/upload
  */
-router.post(
-  '/upload',
-  authenticate,
-  chatLimiter,
-  uploadPDF,
-  handlePDFUpload
-);
+router.post("/upload", authenticate, chatLimiter, uploadPDF, handlePDFUpload);
 
 export default router;

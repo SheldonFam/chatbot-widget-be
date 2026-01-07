@@ -48,11 +48,13 @@ FRONTEND_URL=http://localhost:5173
 ### 3. Run the Server
 
 **Development:**
+
 ```bash
 npm run dev
 ```
 
 **Production:**
+
 ```bash
 npm run build
 npm start
@@ -73,11 +75,13 @@ http://localhost:3001/api/v1
 All endpoints except `/health` require authentication. Include your API key in the request header:
 
 **Option 1: Bearer Token**
+
 ```
 Authorization: Bearer your_api_key_here
 ```
 
 **Option 2: Custom Header**
+
 ```
 x-api-key: your_api_key_here
 ```
@@ -91,6 +95,7 @@ x-api-key: your_api_key_here
 Health check endpoint (no authentication required).
 
 **Response:**
+
 ```json
 {
   "status": "ok",
@@ -106,12 +111,14 @@ Health check endpoint (no authentication required).
 Send a message and receive a complete AI response.
 
 **Headers:**
+
 ```
 Authorization: Bearer your_api_key_here
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
   "message": "What is TypeScript?",
@@ -129,6 +136,7 @@ Content-Type: application/json
 ```
 
 **Response (Success):**
+
 ```json
 {
   "success": true,
@@ -137,6 +145,7 @@ Content-Type: application/json
 ```
 
 **Response (Error):**
+
 ```json
 {
   "success": false,
@@ -155,6 +164,7 @@ Content-Type: application/json
 Stream AI responses in real-time using Server-Sent Events.
 
 **Headers:**
+
 ```
 Authorization: Bearer your_api_key_here
 Content-Type: application/json
@@ -163,6 +173,7 @@ Content-Type: application/json
 **Request Body:** Same as `/api/v1/chat`
 
 **Response (SSE Stream):**
+
 ```
 data: {"success":true,"response":"Type","done":false}
 
@@ -179,24 +190,24 @@ data: {"success":true,"response":"","done":true}
 
 ### Required
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `GOOGLE_API_KEY` | Google Gemini API key | `AIza...` |
-| `API_KEY` | API key for endpoint authentication | `my-secure-key-123` |
+| Variable         | Description                         | Example             |
+| ---------------- | ----------------------------------- | ------------------- |
+| `GOOGLE_API_KEY` | Google Gemini API key               | `AIza...`           |
+| `API_KEY`        | API key for endpoint authentication | `my-secure-key-123` |
 
 ### Optional
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | Server port | `3001` |
-| `NODE_ENV` | Environment mode | `development` |
-| `FRONTEND_URL` | Allowed CORS origins (comma-separated) | `http://localhost:5173` |
-| `AI_MODEL` | Gemini model to use | `gemini-2.0-flash-exp` |
-| `SYSTEM_INSTRUCTION` | AI system prompt | `You are a helpful assistant...` |
-| `MAX_OUTPUT_TOKENS` | Maximum AI response length | `500` |
-| `TEMPERATURE` | AI creativity (0.0-1.0) | `0.7` |
-| `RATE_LIMIT_WINDOW_MS` | Rate limit window in milliseconds | `60000` (1 min) |
-| `RATE_LIMIT_MAX_REQUESTS` | Max requests per window | `100` |
+| Variable                  | Description                            | Default                          |
+| ------------------------- | -------------------------------------- | -------------------------------- |
+| `PORT`                    | Server port                            | `3001`                           |
+| `NODE_ENV`                | Environment mode                       | `development`                    |
+| `FRONTEND_URL`            | Allowed CORS origins (comma-separated) | `http://localhost:5173`          |
+| `AI_MODEL`                | Gemini model to use                    | `gemini-2.0-flash-exp`           |
+| `SYSTEM_INSTRUCTION`      | AI system prompt                       | `You are a helpful assistant...` |
+| `MAX_OUTPUT_TOKENS`       | Maximum AI response length             | `500`                            |
+| `TEMPERATURE`             | AI creativity (0.0-1.0)                | `0.7`                            |
+| `RATE_LIMIT_WINDOW_MS`    | Rate limit window in milliseconds      | `60000` (1 min)                  |
+| `RATE_LIMIT_MAX_REQUESTS` | Max requests per window                | `100`                            |
 
 ## Project Structure
 
@@ -267,16 +278,19 @@ Custom error classes for better error categorization:
 ## Development
 
 ### Run Tests
+
 ```bash
 npm test
 ```
 
 ### Build TypeScript
+
 ```bash
 npm run build
 ```
 
 ### Lint Code
+
 ```bash
 npm run lint
 ```
@@ -305,16 +319,16 @@ pm2 startup
 ### JavaScript/TypeScript
 
 ```typescript
-const response = await fetch('http://localhost:3001/api/v1/chat', {
-  method: 'POST',
+const response = await fetch("http://localhost:3001/api/v1/chat", {
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer your_api_key_here'
+    "Content-Type": "application/json",
+    Authorization: "Bearer your_api_key_here",
   },
   body: JSON.stringify({
-    message: 'Hello!',
-    history: []
-  })
+    message: "Hello!",
+    history: [],
+  }),
 });
 
 const data = await response.json();
@@ -325,11 +339,11 @@ console.log(data.response);
 
 ```typescript
 const eventSource = new EventSource(
-  'http://localhost:3001/api/v1/chat/stream',
+  "http://localhost:3001/api/v1/chat/stream",
   {
     headers: {
-      'Authorization': 'Bearer your_api_key_here'
-    }
+      Authorization: "Bearer your_api_key_here",
+    },
   }
 );
 
@@ -346,17 +360,21 @@ eventSource.onmessage = (event) => {
 ## Troubleshooting
 
 ### "Missing required environment variables"
+
 - Ensure `.env` file exists with `GOOGLE_API_KEY` and `API_KEY`
 
 ### "Invalid API key" (401)
+
 - Check that you're sending the correct API key in headers
 - Verify header format: `Authorization: Bearer <key>` or `x-api-key: <key>`
 
 ### "Too many requests" (429)
+
 - You've hit the rate limit
 - Wait a minute or adjust `RATE_LIMIT_MAX_REQUESTS` in `.env`
 
 ### CORS errors
+
 - Add your frontend URL to `FRONTEND_URL` in `.env`
 - Multiple origins: `FRONTEND_URL=http://localhost:3000,http://localhost:5173`
 

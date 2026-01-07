@@ -26,4 +26,3 @@ router.post("/upload", chatLimiter, uploadPDF, handlePDFUpload);
 router.post("/qa", chatLimiter, handleDocumentQA);
 
 export default router;
-

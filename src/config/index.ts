@@ -102,7 +102,7 @@ function createConfig(): Config {
     allowedOrigins: parseAllowedOrigins(),
 
     ai: {
-      model: "gemini-2.5-flash",
+      model: process.env.AI_MODEL || "gemini-2.5-flash",
       useVertexAI,
       vertexProjectId: useVertexAI
         ? process.env.GOOGLE_CLOUD_PROJECT

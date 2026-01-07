@@ -89,10 +89,7 @@ export class AIService {
         contents,
       });
 
-      console.log("response", response);
-
       const text = response.text;
-      console.log("text", text);
 
       if (!text) {
         throw new AIServiceError("AI returned empty response");
