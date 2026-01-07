@@ -3,6 +3,7 @@
  * Validates API key for protected endpoints
  */
 
+import crypto from "crypto";
 import { Request, Response, NextFunction } from "express";
 import { config } from "../config/index.js";
 import { AuthenticationError } from "../errors/index.js";
@@ -14,6 +15,8 @@ import { AuthenticationError } from "../errors/index.js";
  * Expected formats:
  * - Authorization: Bearer <api-key>
  * - x-api-key: <api-key>
+ *
+ * Security: Uses timing-safe comparison to prevent timing attacks
  */
 export function authenticate(
   req: Request,
@@ -23,9 +26,7 @@ export function authenticate(
   try {
     // Extract API key from headers
     const authHeader = req.headers.authorization;
-    console.log("authHeader", authHeader);
     const apiKeyHeader = req.headers["x-api-key"] as string | undefined;
-    console.log("apiKeyHeader", apiKeyHeader);
 
     let providedKey: string | undefined;
 
@@ -42,7 +43,18 @@ export function authenticate(
       );
     }
 
-    if (providedKey !== config.apiKey) {
+    // Use timing-safe comparison to prevent timing attacks
+    // This ensures comparison takes constant time regardless of where strings differ
+    const providedBuffer = Buffer.from(providedKey);
+    const expectedBuffer = Buffer.from(config.apiKey);
+
+    // Check length first (not timing-sensitive since length is not secret)
+    // Then use crypto.timingSafeEqual for constant-time comparison
+    const isValid =
+      providedBuffer.length === expectedBuffer.length &&
+      crypto.timingSafeEqual(providedBuffer, expectedBuffer);
+
+    if (!isValid) {
       throw new AuthenticationError("Invalid API key");
     }
 

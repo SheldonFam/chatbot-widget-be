@@ -26,7 +26,7 @@ const app = express();
 // ============================================
 
 /**
- * w configuration
+ * CORS configuration
  * Allows requests from configured frontend origins
  */
 app.use(
@@ -76,6 +76,8 @@ app.get("/", (_req, res) => {
       health: "/api/v1/health",
       chat: "/api/v1/chat",
       chatStream: "/api/v1/chat/stream",
+      documentUpload: "/api/v1/documents/upload",
+      documentQA: "/api/v1/documents/qa",
     },
     documentation: "See README.md for API documentation",
   });
@@ -103,15 +105,19 @@ app.use(errorHandler);
  * Start the Express server
  */
 app.listen(config.port, () => {
+  /* eslint-disable no-console */
   console.log(`\n🚀 Server started successfully!`);
   console.log(`📡 Port: ${config.port}`);
   console.log(`🌍 Environment: ${config.nodeEnv}`);
   console.log(`🤖 AI Model: ${config.ai.model}`);
   console.log(`🔗 Base URL: http://localhost:${config.port}`);
   console.log(`\n📚 Available endpoints:`);
-  console.log(`   GET  /api/v1/health       - Health check`);
-  console.log(`   POST /api/v1/chat         - Chat (non-streaming)`);
-  console.log(`   POST /api/v1/chat/stream  - Chat (streaming)`);
+  console.log(`   GET  /api/v1/health            - Health check`);
+  console.log(`   POST /api/v1/chat              - Chat (non-streaming)`);
+  console.log(`   POST /api/v1/chat/stream       - Chat (streaming)`);
+  console.log(`   POST /api/v1/documents/upload  - Upload PDF document`);
+  console.log(`   POST /api/v1/documents/qa      - Q&A over document`);
+  /* eslint-enable no-console */
 });
 
 export default app;

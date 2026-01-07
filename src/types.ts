@@ -53,3 +53,29 @@ export interface HealthResponse {
   message: string;
   timestamp?: number;
 }
+
+// ============================================
+// PDF Document Types
+// ============================================
+
+export interface PDFUploadResponse {
+  success: boolean;
+  fileUri: string;
+  fileName: string;
+  mimeType: string;
+  size?: number;
+  error?: string;
+}
+
+export interface DocumentQARequest {
+  fileUri: string;
+  question: string;
+  history?: Message[];
+}
+
+export interface DocumentQAResponse {
+  success: boolean;
+  response: string;
+  error?: string;
+  details?: string;
+}
