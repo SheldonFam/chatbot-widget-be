@@ -101,17 +101,6 @@ export class AIService {
         throw error;
       }
 
-      // Log the full error to understand what's happening
-      console.error("🔴 Gemini API Error Details:", {
-        errorType: error?.constructor?.name,
-        message: error instanceof Error ? error.message : String(error),
-        code: (error as any)?.code,
-        status: (error as any)?.status,
-        statusCode: (error as any)?.statusCode,
-        details: (error as any)?.details,
-        fullError: error,
-      });
-
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       throw new AIServiceError("Failed to generate AI response", errorMessage);
@@ -173,17 +162,12 @@ export class AIService {
         const errorMsg = `Files API not available. Available methods: ${
           this.ai.files ? Object.keys(this.ai.files).join(", ") : "none"
         }`;
-        console.error("❌", errorMsg);
+
         throw new AIServiceError(errorMsg);
       }
 
       // Convert Buffer to Blob for the SDK
       const fileBlob = new Blob([fileBuffer], { type: "application/pdf" });
-
-      console.log("📤 Uploading PDF:", {
-        fileName,
-        size: fileBuffer.length,
-      });
 
       // Upload file using Files API
       const uploadedFile = await this.ai.files.upload({
@@ -191,13 +175,6 @@ export class AIService {
         config: {
           displayName: fileName,
         },
-      });
-
-      console.log("📥 Upload response:", {
-        name: uploadedFile?.name,
-        uri: uploadedFile?.uri,
-        state: uploadedFile?.state,
-        mimeType: uploadedFile?.mimeType,
       });
 
       // Wait for file to be processed if needed
@@ -214,9 +191,6 @@ export class AIService {
           await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2 seconds
           fileStatus = await this.ai.files.get({ name: fileStatus.name });
           attempts++;
-          console.log(
-            `⏳ File processing... (attempt ${attempts}/${maxAttempts})`
-          );
         }
 
         if (fileStatus.state === "FAILED") {
@@ -239,16 +213,6 @@ export class AIService {
         mimeType: uploadedFile.mimeType || "application/pdf",
       };
     } catch (error) {
-      console.error("🔴 PDF Upload Error:", {
-        errorType: error?.constructor?.name,
-        message: error instanceof Error ? error.message : String(error),
-        code: (error as any)?.code,
-        status: (error as any)?.status,
-        statusCode: (error as any)?.statusCode,
-        details: (error as any)?.details,
-        stack: error instanceof Error ? error.stack : undefined,
-      });
-
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
       throw new AIServiceError("Failed to upload PDF", errorMessage);
@@ -325,9 +289,6 @@ export class AIService {
 
         if (isTransientError && attempt < maxRetries) {
           const delay = Math.min(1000 * Math.pow(2, attempt - 1), 5000); // Exponential backoff, max 5s
-          console.log(
-            `⚠️ Transient error (${status}), retrying in ${delay}ms... (attempt ${attempt}/${maxRetries})`
-          );
           await new Promise((resolve) => setTimeout(resolve, delay));
           continue; // Retry
         }
@@ -336,23 +297,8 @@ export class AIService {
         if (status === 503) {
           const friendlyMessage =
             "The AI model is currently overloaded. Please try again in a few moments.";
-          console.error("🔴 Document Q&A Error (503):", {
-            errorType: error?.constructor?.name,
-            message: errorMessage,
-            status,
-          });
           throw new AIServiceError(friendlyMessage, errorMessage);
         }
-
-        // Handle other API errors
-        console.error("🔴 Document Q&A Error:", {
-          errorType: error?.constructor?.name,
-          message: errorMessage,
-          code: (error as any)?.code,
-          status,
-          statusCode: (error as any)?.statusCode,
-          details: (error as any)?.details,
-        });
 
         throw new AIServiceError(
           "Failed to generate document Q&A response",
