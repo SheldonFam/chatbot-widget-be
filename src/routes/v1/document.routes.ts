@@ -8,8 +8,8 @@ import {
   handlePDFUpload,
   uploadPDF,
   handleDocumentQA,
-} from "../../controllers/documentController.js";
-import { chatLimiter } from "../../middleware/rateLimiter.js";
+} from "../../controllers/documentController";
+import { chatLimiter } from "../../middleware/rateLimiter";
 
 const router = Router();
 

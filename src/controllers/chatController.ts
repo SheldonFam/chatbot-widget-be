@@ -4,10 +4,10 @@
  */
 
 import { Request, Response, NextFunction } from "express";
-import { aiService } from "../services/aiService.js";
-import { ValidationError } from "../errors/index.js";
-import { validateChatRequest } from "../utils/validation.js";
-import type { ChatRequest, ChatResponse, StreamChunk } from "../types.js";
+import { aiService } from "../services/aiService";
+import { ValidationError } from "../errors/index";
+import { validateChatRequest } from "../utils/validation";
+import type { ChatRequest, ChatResponse, StreamChunk } from "../types";
 
 /**
  * Handle non-streaming chat request

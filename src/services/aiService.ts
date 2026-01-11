@@ -4,9 +4,9 @@
  */
 
 import { GoogleGenAI } from "@google/genai";
-import { config } from "../config/index.js";
-import { AIServiceError } from "../errors/index.js";
-import type { Message } from "../types.js";
+import { config } from "../config/index";
+import { AIServiceError } from "../errors/index";
+import type { Message } from "../types";
 
 /**
  * Content part for AI API

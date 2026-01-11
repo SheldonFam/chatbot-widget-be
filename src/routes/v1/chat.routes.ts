@@ -4,11 +4,8 @@
  */
 
 import { Router } from "express";
-import {
-  handleChat,
-  handleChatStream,
-} from "../../controllers/chatController.js";
-import { chatLimiter } from "../../middleware/rateLimiter.js";
+import { handleChat, handleChatStream } from "../../controllers/chatController";
+import { chatLimiter } from "../../middleware/rateLimiter";
 
 const router = Router();
 
