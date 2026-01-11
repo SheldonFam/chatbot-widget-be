@@ -1,7 +1,7 @@
 {
   "name": "chatbot-widget-server",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "description": "Backend API for chatbot widget",
   "main": "dist/index.js",
   "scripts": {

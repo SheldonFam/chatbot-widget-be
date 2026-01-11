@@ -4,8 +4,8 @@
  */
 
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "../errors/index.js";
-import { isDevelopment } from "../config/index.js";
+import { AppError } from "../errors/index";
+import { isDevelopment } from "../config/index";
 
 /**
  * Standard error response format

@@ -4,7 +4,7 @@
  */
 
 import { Router } from "express";
-import { handleHealthCheck } from "../../controllers/healthController.js";
+import { handleHealthCheck } from "../../controllers/healthController";
 
 const router = Router();
 

@@ -5,14 +5,14 @@
 
 import { Request, Response, NextFunction } from "express";
 import multer from "multer";
-import { aiService } from "../services/aiService.js";
-import { ValidationError } from "../errors/index.js";
-import { validateDocumentQARequest } from "../utils/validation.js";
+import { aiService } from "../services/aiService";
+import { ValidationError } from "../errors/index";
+import { validateDocumentQARequest } from "../utils/validation";
 import type {
   PDFUploadResponse,
   DocumentQARequest,
   DocumentQAResponse,
-} from "../types.js";
+} from "../types";
 
 /**
  * Configure multer for PDF file uploads
@@ -25,14 +25,14 @@ const upload = multer({
     fileSize: 10 * 1024 * 1024, // 10MB limit (reduced from 50MB for better security)
     files: 1, // Only accept 1 file at a time
   },
-  fileFilter: (_req, file, cb) => {
+  fileFilter: (
+    _req: Request,
+    file: Express.Multer.File,
+    cb: multer.FileFilterCallback
+  ) => {
     // Security: Validate MIME type
     if (file.mimetype !== "application/pdf") {
-      cb(
-        new ValidationError(
-          "Invalid file type. Only PDF files are allowed."
-        ) as any
-      );
+      cb(new ValidationError("Invalid file type. Only PDF files are allowed."));
       return;
     }
 
@@ -42,7 +42,7 @@ const upload = multer({
       cb(
         new ValidationError(
           "Invalid file extension. Only .pdf files are allowed."
-        ) as any
+        )
       );
       return;
     }
@@ -52,7 +52,7 @@ const upload = multer({
       cb(
         new ValidationError(
           "Invalid filename. Filename contains forbidden characters."
-        ) as any
+        )
       );
       return;
     }

@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "ESNext",
+    "target": "es2020",
+    "module": "commonjs",
     "moduleResolution": "node",
-    "lib": ["ES2022"],
+    "lib": ["es2020"],
     "outDir": "./dist",
     "rootDir": "./",
     "strict": true,
@@ -21,6 +21,5 @@
     "noFallthroughCasesInSwitch": true,
     "types": ["node"]
   },
-  "include": ["api/**/*.ts", "src/**/*.ts", "utils/**/*.ts", "index.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src"]
 }

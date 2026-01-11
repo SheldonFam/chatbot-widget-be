@@ -5,8 +5,8 @@
 
 import crypto from "crypto";
 import { Request, Response, NextFunction } from "express";
-import { config } from "../config/index.js";
-import { AuthenticationError } from "../errors/index.js";
+import { config } from "../config/index";
+import { AuthenticationError } from "../errors/index";
 
 /**
  * API Key authentication middleware

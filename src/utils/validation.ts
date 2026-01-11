@@ -1,4 +1,4 @@
-import type { ChatRequest, DocumentQARequest } from "../types.js";
+import type { ChatRequest, DocumentQARequest } from "../types";
 
 // Security limits to prevent abuse and DoS attacks
 const MAX_MESSAGE_LENGTH = 5000; // 5000 characters per message
