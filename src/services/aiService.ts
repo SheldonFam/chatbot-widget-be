@@ -279,9 +279,16 @@ export class AIService {
         }
 
         lastError = error as Error;
-        const status = (error as any)?.status || (error as any)?.statusCode;
         const errorMessage =
           error instanceof Error ? error.message : String(error);
+
+        // Extract HTTP status from error object
+        let status: number | undefined;
+        if (error instanceof Error && "status" in error) {
+          status = (error as Error & { status: number }).status;
+        } else if (error instanceof Error && "statusCode" in error) {
+          status = (error as Error & { statusCode: number }).statusCode;
+        }
 
         // Retry on transient errors (503, 429, 500)
         const isTransientError =
