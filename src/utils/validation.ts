@@ -1,7 +1,6 @@
 import type { ChatRequest, DocumentQARequest } from "../types";
 
 // Security limits to prevent abuse and DoS attacks
-const MAX_MESSAGE_LENGTH = 5000; // 5000 characters per message
 const MAX_HISTORY_LENGTH = 50; // Maximum 50 messages in history
 const MAX_QUESTION_LENGTH = 2000; // 2000 characters for document questions
 
@@ -21,11 +20,6 @@ export function validateChatRequest(body: unknown): string | null {
   // Validate message exists
   if (!message || typeof message !== "string" || message.trim().length === 0) {
     return "Message is required and must be a non-empty string";
-  }
-
-  // Security: Limit message length to prevent DoS attacks
-  if (message.length > MAX_MESSAGE_LENGTH) {
-    return `Message too long (maximum ${MAX_MESSAGE_LENGTH} characters)`;
   }
 
   // Validate history format
@@ -57,10 +51,6 @@ export function validateChatRequest(body: unknown): string | null {
 
       if (msg.role !== "user" && msg.role !== "assistant") {
         return `History message at index ${i} has invalid role (must be 'user' or 'assistant')`;
-      }
-
-      if (msg.content.length > MAX_MESSAGE_LENGTH) {
-        return `History message at index ${i} too long (maximum ${MAX_MESSAGE_LENGTH} characters)`;
       }
     }
   }
@@ -146,10 +136,6 @@ export function validateDocumentQARequest(body: unknown): string | null {
 
       if (msg.role !== "user" && msg.role !== "assistant") {
         return `History message at index ${i} has invalid role (must be 'user' or 'assistant')`;
-      }
-
-      if (msg.content.length > MAX_MESSAGE_LENGTH) {
-        return `History message at index ${i} too long (maximum ${MAX_MESSAGE_LENGTH} characters)`;
       }
     }
   }
